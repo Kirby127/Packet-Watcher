@@ -71,12 +71,23 @@ while True:
 	print "---------------------------------------------------------------------------"
 
 	#Split packets into files by Layer 7 Protocols
-	ports = {22 : "ssh", 80 : "http", 443 : "https"}
-	
+        #Split packets into files by Layer 7 Protocols
+	ports = {}
+
+	#Importing information from setup.sh into the dictionary
+	y = 0
+	while y < int(os.environ['num_proto']):
+        	proto_name = subprocess.check_output("awk NR=="+str(y+1)+"'{print;exit}' protocol.txt | awk '{print $1}'", shell="True")
+        	port_num = subprocess.check_output("awk NR=="+str(y+1)+"'{print;exit}' protocol.txt | awk '{print $3}'", shell="True")
+        	proto_name = proto_name[ : -1]
+        	port_num = port_num[ : -1]
+        	ports[port_num]=proto_name
+        	y = y + 1
+
 	#Using system module to enter variable information into log file
 	x = 0
-	while x < 500: 
-		val = str(ports.get(x))
-		if val != "None" and str(source_port) == str(x):
-			os.system("echo "+s_addr+" >> "+val+".log")
-		x = x + 1
+	while x < 500:
+        	val = str(ports.get(str(x)))
+        	if str(val) != "None" and str(source_port) == str(x):
+                	os.system("echo "+s_addr+" >> "+str(val)+".log")
+        	x = x + 1
